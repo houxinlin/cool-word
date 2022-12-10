@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="10dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:hint="单词"
+        android:id="@+id/tv_word"
+        android:textSize="15sp"
+        android:background="@drawable/shape_editview"
+        android:layout_width="match_parent"
+        android:layout_height="40dp">
+
+    </com.google.android.material.textfield.MaterialAutoCompleteTextView>
+
+    <LinearLayout
+        android:layout_marginTop="10dp"
+
+        android:gravity="center"
+        android:background="@drawable/shape_editview"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <EditText
+            android:background="@drawable/shape_editview"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:id="@+id/tv_mean"
+            android:textSize="15sp"
+            android:hint="意义"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="40dp" />
+        <ImageView
+
+            android:padding="4dp"
+            android:src="@drawable/ic_query"
+            android:layout_width="30dp"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+</LinearLayout>
