@@ -9,8 +9,8 @@ import java.util.concurrent.TimeUnit
 
 
 object Net {
-    private const val HOST = "https://www.houxinlin.com/xiaoan-word/"
-
+//    private const val HOST = "https://www.houxinlin.com/xiaoan-word/"
+private const val HOST = "http://192.168.124.10:6061/"
     private val okHttpClient = OkHttpClient()
         .newBuilder()
         .connectTimeout(3,TimeUnit.SECONDS)

@@ -25,9 +25,9 @@ object RxJavaUtils {
     }
 }
 
-fun <T :Any> Observable<T>.baseSubscrib(
+fun <T :Any> Observable<T>.baseSubscribe(
     onNext: io.reactivex.rxjava3.functions.Consumer<in T>,
     onError: io.reactivex.rxjava3.functions.Consumer<Throwable>,
-) {
-    this.subscribe(onNext,onError, Functions.EMPTY_ACTION)
+):Disposable {
+    return this.subscribe(onNext,onError, Functions.EMPTY_ACTION)
 }

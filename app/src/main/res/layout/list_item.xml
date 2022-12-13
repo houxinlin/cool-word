@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="1px"
         android:layout_alignParentBottom="true"
-        android:background="#D0C8C8">
+        android:background="#54D0C8C8">
 
     </View>
 
@@ -21,7 +21,7 @@
         <ImageView
             android:id="@+id/iv_voice"
             android:layout_gravity="center"
-            android:src="@drawable/ic_sound"
+            android:src="@drawable/ic_play"
             android:layout_width="19dp"
             android:layout_height="wrap_content" />
         <LinearLayout

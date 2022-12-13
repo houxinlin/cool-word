@@ -16,6 +16,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.widget.AppCompatImageButton
+import androidx.core.widget.doOnTextChanged
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -166,7 +167,7 @@ class NumberPicker @JvmOverloads constructor(
         val array = context.theme.obtainStyledAttributes(attrs,
             R.styleable.NumberPicker, defStyleAttr, defStyleRes)
         try {
-            val maxValue = array.getInteger(R.styleable.NumberPicker_picker_max, 100)
+            val maxValue = array.getInteger(R.styleable.NumberPicker_picker_max, 500)
             val minValue = array.getInteger(R.styleable.NumberPicker_picker_min, 0)
             val stepSize = array.getInteger(R.styleable.NumberPicker_picker_stepSize, 1)
             val orientation = array.getInteger(R.styleable.NumberPicker_picker_orientation, LinearLayout.VERTICAL)
@@ -337,15 +338,15 @@ class NumberPicker @JvmOverloads constructor(
             }
         }
 
-//        editText.doOnTextChanged { text, _, _, _ ->
-//            if (!text.isNullOrEmpty()) {
-//                try {
-//                    this.setProgress(Integer.valueOf(text.toString()))
-//                } catch (e: NumberFormatException) {
-//                    Timber.e(e)
-//                }
-//            }
-//        }
+        editText.doOnTextChanged { text, _, _, _ ->
+            if (!text.isNullOrEmpty()) {
+                try {
+                    this.setProgress(Integer.valueOf(text.toString()))
+                } catch (e: NumberFormatException) {
+                    Timber.e(e)
+                }
+            }
+        }
 
         editText.setOnFocusChangeListener { _, hasFocus ->
             setBackgroundFocused(hasFocus)

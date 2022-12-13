@@ -1,9 +1,336 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.activity.WordTestActivity">
+    xmlns:tools="http://schemas.android.com/tools">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <data>
+
+    </data>
+
+    <RelativeLayout
+        android:background="@drawable/main_back"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.hxl.android.xiaoan.word.ui.widget.base.WordViewGroup
+            android:id="@+id/word_viewgroup"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:orientation="vertical"
+                tools:context=".ui.activity.WordTestActivity">
+
+                <com.google.android.material.appbar.AppBarLayout
+                    android:id="@+id/appbar_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:elevation="0dp"
+                    android:theme="@style/Theme.Xiaoanword.AppBarOverlay"
+                    app:elevation="0dp">
+
+                    <com.google.android.material.appbar.MaterialToolbar
+                        android:id="@+id/toolbar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:elevation="0dp"
+                        app:elevation="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="18dp"
+                            android:background="#ff0000"
+                            android:gravity="center">
+
+                            <com.hxl.android.xiaoan.word.ui.widget.base.WordProgressBar
+                                android:id="@+id/word_progress"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:background="#F6F3F3" />
+                        </LinearLayout>
+                    </com.google.android.material.appbar.MaterialToolbar>
+                </com.google.android.material.appbar.AppBarLayout>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#00FAFAFA"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:elevation="0dp"
+                        app:cardCornerRadius="10dp"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="0dp">
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="#57FFFFFF"
+                            android:padding="6dp">
+
+                            <TextView
+                                android:id="@+id/tv_word"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Hello"
+                                android:textColor="#000000"
+                                android:textSize="28sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tv_mean"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@+id/tv_word"
+                                android:layout_marginTop="15dp"
+                                android:textColor="#000000"
+                                android:textSize="28sp"
+                                android:textStyle="bold">
+
+                            </TextView>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@+id/tv_mean"
+                                android:layout_marginTop="20dp">
+
+                            </LinearLayout>
+
+                            <TextView
+                                android:id="@+id/tv_tip"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentBottom="true"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginBottom="4dp"
+                                android:text="点击查看提示"
+                                android:textColor="#4D4B4B" />
+                        </RelativeLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <RelativeLayout
+                        android:id="@+id/rl_controller"
+                        android:layout_width="match_parent"
+                        android:layout_height="170dp"
+                        android:clipChildren="false"
+                        android:clipToPadding="false">
+
+
+                        <com.hxl.android.xiaoan.word.ui.widget.base.ScaleMaterialCardView
+                            android:id="@+id/btn_incognizance"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:layout_centerVertical="true"
+                            app:cardCornerRadius="100dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:background="#E17676"
+                                android:gravity="center"
+                                android:orientation="vertical">
+
+                                <ImageView
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:src="@drawable/ic_wailing_face" />
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:text="不认识"
+                                    android:textColor="#FFFFFF"
+                                    android:textSize="12sp" />
+
+                            </LinearLayout>
+                        </com.hxl.android.xiaoan.word.ui.widget.base.ScaleMaterialCardView>
+
+                        <com.hxl.android.xiaoan.word.ui.widget.base.ScaleMaterialCardView
+                            android:id="@+id/btn_vague"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:layout_centerInParent="true"
+                            app:cardCornerRadius="100dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:background="#38B1C7"
+                                android:gravity="center"
+                                android:orientation="vertical">
+
+                                <ImageView
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:src="@drawable/ic_wailing_face" />
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:text="模糊"
+                                    android:textColor="#FFFFFF"
+                                    android:textSize="12sp" />
+
+                            </LinearLayout>
+                        </com.hxl.android.xiaoan.word.ui.widget.base.ScaleMaterialCardView>
+
+                        <com.hxl.android.xiaoan.word.ui.widget.base.ScaleMaterialCardView
+                            android:id="@+id/btn_know"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            app:cardCornerRadius="100dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:background="#3DCCAB"
+                                android:gravity="center"
+                                android:orientation="vertical">
+
+                                <ImageView
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:src="@drawable/ic_wailing_face" />
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:text="认识"
+                                    android:textColor="#FFFFFF"
+                                    android:textSize="12sp" />
+
+                            </LinearLayout>
+                        </com.hxl.android.xiaoan.word.ui.widget.base.ScaleMaterialCardView>
+
+                        <com.hxl.android.xiaoan.word.ui.widget.base.ScaleMaterialCardView
+                            android:id="@+id/btn_next"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:layout_centerInParent="true"
+                            android:visibility="gone"
+                            app:cardCornerRadius="100dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:background="#000000"
+                                android:gravity="center"
+                                android:orientation="vertical">
+
+                                <ImageView
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:src="@drawable/ic_next" />
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:text="继续"
+                                    android:textColor="#FFFFFF"
+                                    android:textSize="12sp" />
+
+                            </LinearLayout>
+                        </com.hxl.android.xiaoan.word.ui.widget.base.ScaleMaterialCardView>
+                    </RelativeLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+
+                android:layout_height="match_parent"
+                android:background="#00FFFFFF"
+                android:orientation="vertical"
+                android:padding="40dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="例句"
+                        android:textColor="#000000"
+                        android:textSize="23sp" />
+
+                    <ListView
+                        android:paddingRight="5dp"
+                        android:paddingLeft="5dp"
+                        android:id="@+id/example_listview"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="4dp"
+                        android:background="#ffffff"
+                        android:divider="@null">
+
+                    </ListView>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="170dp">
+
+                </LinearLayout>
+            </LinearLayout>
+        </com.hxl.android.xiaoan.word.ui.widget.base.WordViewGroup>
+
+
+        <com.hxl.android.xiaoan.word.ui.widget.base.ScaleMaterialCardView
+            android:alpha="0"
+            android:id="@+id/btn_back"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginBottom="90dp"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"
+            app:cardCornerRadius="100dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#000000"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:rotation="180"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_next" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="返回"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+        </com.hxl.android.xiaoan.word.ui.widget.base.ScaleMaterialCardView>
+
+    </RelativeLayout>
+
+</layout>

@@ -2,16 +2,17 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="50dp"
-    android:background="#FDFDFD"
+    android:background="#000D0D0D"
     android:minHeight="50dp">
     <View
         android:layout_width="match_parent"
         android:layout_height="1px"
         android:layout_alignParentBottom="true"
-        android:background="#B5AFAF">
+        android:background="#00FFFFFF">
 
     </View>
     <TextView
+        android:paddingLeft="4dp"
         android:id="@+id/tv_name"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

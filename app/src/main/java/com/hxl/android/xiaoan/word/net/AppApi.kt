@@ -16,5 +16,9 @@ interface AppApi {
 
     @POST("word/add")
     @FormUrlEncoded
-    fun addWord(@Field("word")word:String,@Field("mean")mean:String):Call<String>
+    fun addWord(@Field("word") word: String, @Field("mean") mean: String): Call<String>
+
+    @POST("word/list")
+    @FormUrlEncoded
+    fun listWord(@Field("exclude") exclude: IntArray): Call<List<WordBean>>
 }

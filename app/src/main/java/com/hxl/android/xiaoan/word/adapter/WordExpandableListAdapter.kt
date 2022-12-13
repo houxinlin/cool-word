@@ -93,13 +93,13 @@ class WordExpandableListAdapter(
 
     override fun getGroupView(
         listPosition: Int, isExpanded: Boolean,
-        convertView: View?, parent: ViewGroup?
+        convertViewCache: View?, parent: ViewGroup?
     ): View? {
-        var convertView = convertView
+        var convertView = convertViewCache
         val listTitle = getGroup(listPosition) as String?
         if (convertView == null) {
             val layoutInflater =
-                context!!.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             convertView = layoutInflater.inflate(R.layout.list_group, parent, false)
         }
 
