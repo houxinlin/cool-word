@@ -2,6 +2,10 @@ package com.hxl.android.xiaoan.word.utils
 
 import android.content.Context
 import android.util.DisplayMetrics
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.WhichButton
+import com.afollestad.materialdialogs.internal.button.DialogActionButton
+import com.afollestad.materialdialogs.list.customListAdapter
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlin.random.Random
@@ -9,6 +13,7 @@ import kotlin.random.Random
 class KotlinCore {
 
 }
+private val txtPlayer = TxtPlayer()
 
 fun Int.generatorRandom(size: Int): List<Int> {
     val result = mutableListOf<Int>()
@@ -93,4 +98,32 @@ fun <E> MutableList<E>.addCenterNearby(max: Int, value: E): Boolean {
 fun <E> MutableList<E>.addRandom(value: E): Boolean {
     if (this.size <= 2) return add(value)
     return insertNearby(2, this.size + 1, value)
+}
+
+
+ fun MaterialDialog.getPositiveButton(): DialogActionButton {
+    return view.buttonsLayout?.actionButtons?.get(WhichButton.POSITIVE.index)!!
+}
+
+fun MaterialDialog.listCustomItems(
+    items: List<Any> = arrayListOf(),
+    customList: CustomList
+): MaterialDialog {
+
+    return customListAdapter(
+        CustomViewPlainListDialogAdapter(
+            dialog = this,
+            items = items,
+            customList
+        )
+    )
+}
+
+
+fun String.tts(playLan: PlayLan){
+    txtPlayer.player(this,playLan)
+}
+
+fun String.addPrefix(prefix:String):String{
+    return "$prefix$this"
 }

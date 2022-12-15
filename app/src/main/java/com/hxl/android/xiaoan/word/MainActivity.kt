@@ -1,70 +1,60 @@
 package com.hxl.android.xiaoan.word
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.EditText
+import android.widget.SeekBar
+import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.SwitchCompat
-import androidx.lifecycle.ViewModelProvider
-import androidx.room.Room
 import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.WhichButton
-import com.afollestad.materialdialogs.bottomsheets.BasicGridItem
-import com.afollestad.materialdialogs.bottomsheets.BottomSheet
-import com.afollestad.materialdialogs.bottomsheets.gridItems
 import com.afollestad.materialdialogs.customview.customView
-import com.afollestad.materialdialogs.internal.button.DialogActionButton
 import com.afollestad.materialdialogs.list.*
 import com.hxl.android.xiaoan.word.adapter.WordExpandableListAdapter
 import com.hxl.android.xiaoan.word.bean.WordBean
+import com.hxl.android.xiaoan.word.bean.meanKey
+import com.hxl.android.xiaoan.word.bean.wordKey
 import com.hxl.android.xiaoan.word.common.Application
 import com.hxl.android.xiaoan.word.databinding.ActivityMainBinding
-import com.hxl.android.xiaoan.word.net.Net
+import com.hxl.android.xiaoan.word.ui.activity.SettingsActivity
 import com.hxl.android.xiaoan.word.ui.activity.WordTestActivity
-import com.hxl.android.xiaoan.word.ui.widget.numberpicker.NumberPicker
 import com.hxl.android.xiaoan.word.utils.*
-import com.hxl.android.xiaoan.word.utils.RxJavaUtils.createObservable
-import com.hxl.android.xiaoan.word.utils.orm.AppDatabase
+import com.hxl.android.xiaoan.word.utils.SystemUtils.createMaterialDialog
+import com.hxl.android.xiaoan.word.word.TextAutoComplete
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.Arrays
-import kotlin.concurrent.thread
 
 
-class MainActivity : AppCompatActivity() {
-
-    private lateinit var binding: ActivityMainBinding
-    private var wordExpandableListAdapter = WordExpandableListAdapter(this)
-    private val textAutCompat: TextAutoComplete = TextAutoComplete()
-
+class MainActivity : BaseActivity() {
     private val TAG = "TAG"
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var wordExpandableListAdapter: WordExpandableListAdapter
+    private var wordVisible: Boolean = false
+    private var meanVisible: Boolean = false
     private lateinit var exceptionHandler: ExceptionHandler
-
-    private val loadDataFunction: () -> Unit = { loadData() }
-
-    private val txtPlayer = TxtPlayer()
-
-
+    private val textAutCompat: TextAutoComplete = TextAutoComplete()
     private val viewModel: MainViewModel by viewModels()
 
-    private fun textToSpeak(text: String) {
-        thread {
-            try {
-                txtPlayer.player(text)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-    }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        exceptionHandler = ExceptionHandler(this)
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
+        wordExpandableListAdapter = WordExpandableListAdapter(this)
+        initView()
+        loadData()
+        applySetting()
+    }
 
     private fun setLoadLocalWords(list: List<WordBean>) {
         Application.word = list
@@ -75,54 +65,50 @@ class MainActivity : AppCompatActivity() {
             result.add(it)
         }
 
-        Log.i(TAG, "setLoadLocalWords: $adapterData")
         val titles = adapterData.keys.toList()
             .sortedBy { LocalDate.parse(it, DateTimeFormatter.ofPattern("yyyy-MM-dd")) }
         wordExpandableListAdapter.setData(titles.reversed(), adapterData)
         wordExpandableListAdapter.notifyDataSetChanged()
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        exceptionHandler = ExceptionHandler(this)
-        setContentView(binding.root)
-        setSupportActionBar(binding.toolbar)
-
-        initView()
-        loadData()
-        applySetting()
-    }
-
     private fun initView() {
-
         binding.fab.setOnClickListener { showAddWordDialog() }
         binding.listview.setAdapter(wordExpandableListAdapter)
 
-        binding.listview.setOnChildClickListener { expandableListView, view, groupIndex, i2, l ->
-            if (SharedPreferencesUtils.getBoolean("click_show_flag", false)) {
-                val text =
-                    wordExpandableListAdapter.expandableListDetail[wordExpandableListAdapter.expandableListTitle[groupIndex]]!![i2]
-                val current = wordExpandableListAdapter.visibleWords.getOrDefault(text.id, false)
-                wordExpandableListAdapter.visibleWords[text.id] = !current
-                wordExpandableListAdapter.notifyDataSetChanged()
+        binding.listview.setOnChildClickListener { _, _, groupIndex, childIndex, _ ->
+            configPreferences.run {
+                val wordBean = wordExpandableListAdapter.getChild(groupIndex, childIndex)
+                if (getBoolean("click_sync", true)) {
+                    if (getBoolean("show_word", true) && !getBoolean("show_mean", false)) {
+                        wordExpandableListAdapter.reverseVisible(wordBean.meanKey())
+                    }
+                    if (!getBoolean("show_word", false) && getBoolean("show_mean", true)) {
+                        wordExpandableListAdapter.reverseVisible(wordBean.wordKey())
+                    }
+                    wordExpandableListAdapter.notifyDataSetChanged()
+                }
             }
             true
         }
 
         wordExpandableListAdapter.playVoice = {
-            textToSpeak(it.wordName)
+            ttsAuto(it.wordName)
         }
         setGroupIndicatorToRight()
     }
 
     private fun applySetting() {
-        val word = SharedPreferencesUtils.getBoolean("show_word")
-        val mean = SharedPreferencesUtils.getBoolean("show_mean")
+        wordVisible = configPreferences.getBoolean("show_word", true)
+        meanVisible = configPreferences.getBoolean("show_mean", true)
 
-        wordExpandableListAdapter.wordVisibleState = { word }
-        wordExpandableListAdapter.meanVisibleState = { mean }
+        wordExpandableListAdapter.wordVisibleState = { wordVisible }
+        wordExpandableListAdapter.meanVisibleState = { meanVisible }
+        wordExpandableListAdapter.notifyDataSetChanged()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        applySetting()
     }
 
     /**
@@ -135,41 +121,36 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * 添加单词
-     */
-
-    private fun addWord(word: String, mean: String) {
-        createObservable<String> {
-            Net.getAppRetrofit().addWord(word, mean).execute().body()?.run { onNext(this) }
-        }.baseSubscribe({ loadDataFunction.invoke() }, exceptionHandler)
-
-    }
-
-    /**
      * 显示添加单词Dialog
      */
     private fun showAddWordDialog() {
-        startActivity(WordTestActivity.getStartIntent(10, this@MainActivity))
-//        MaterialDialog(this).show {
-//            title(R.string.add_word)
-//            positiveButton(R.string.ok) {
-//                val word = it.findViewById<EditText>(R.id.tv_word).text.toString()
-//                val mean = it.findViewById<EditText>(R.id.tv_mean).text.toString()
-//                addWord(word, mean)
-//
-//            }
-//            customView(R.layout.dialog_add_word)
-//            //自动推荐单词单击后所对因的意思
-//            val itemClick: (String) -> Unit = {
-//                findViewById<EditText>(R.id.tv_mean).text =
-//                    Editable.Factory.getInstance().newEditable(it)
-//            }
-//            this.findViewById<AutoCompleteTextView>(R.id.tv_word).apply {
-//                this.threshold = 1
-//                textAutCompat.bind(this, itemClick)
-//            }
-//
-//        }
+        MaterialDialog(this).show {
+            title(R.string.add_word)
+            positiveButton(R.string.ok) {
+                val word = it.findViewById<EditText>(R.id.tv_word).text.toString()
+                val mean = it.findViewById<EditText>(R.id.tv_mean).text.toString()
+                //插入数据
+                viewModel.importWord(mutableListOf(WordBean().apply {
+                    this.wordMean = mean
+                    this.wordName = word
+                })).subscribe {
+                    loadData()
+                    Toast.makeText(this@MainActivity, "导入成功", Toast.LENGTH_SHORT).show()
+                }
+
+            }
+            customView(R.layout.dialog_add_word)
+            //自动推荐单词单击后所对因的意思
+            val itemClick: (String) -> Unit = {
+                findViewById<EditText>(R.id.tv_mean).text =
+                    Editable.Factory.getInstance().newEditable(it)
+            }
+            this.findViewById<AutoCompleteTextView>(R.id.tv_word).apply {
+                this.threshold = 1
+                textAutCompat.bind(this, itemClick)
+            }
+
+        }
     }
 
 
@@ -184,49 +165,32 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    private fun showSettingDialog() {
-        MaterialDialog(this, BottomSheet()).show {
-            customView(R.layout.dialog_setting)
-            val meanSwitch = findViewById<SwitchCompat>(R.id.switch_show_mean)
-            val wordSwitch = findViewById<SwitchCompat>(R.id.switch_show_word)
-            val clickSwitch = findViewById<SwitchCompat>(R.id.switch_click_show)
-            meanSwitch.isChecked = SharedPreferencesUtils.getBoolean("show_mean")
-            wordSwitch.isChecked = SharedPreferencesUtils.getBoolean("show_word")
-            clickSwitch.isChecked = SharedPreferencesUtils.getBoolean("click_show_flag")
-
-            meanSwitch.setOnCheckedChangeListener { _, b ->
-                if (b) clickSwitch.isChecked = false
-                changeWordState("show_mean", b)
-            }
-            wordSwitch.setOnCheckedChangeListener { _, b -> changeWordState("show_word", b) }
-            clickSwitch.setOnCheckedChangeListener { _, b ->
-                if (b) meanSwitch.isChecked = false
-                changeWordState("click_show_flag", b)
-            }
-        }
-    }
-
-    private fun changeWordState(key: String, value: Boolean) {
-        SharedPreferencesUtils.setBoolean(key, value)
-        applySetting()
-        wordExpandableListAdapter.notifyDataSetChanged()
-    }
-
-
     private fun showTestNumberDialog() {
         MaterialDialog(this).show {
             title(text = "选择测试数量")
             customView(R.layout.dialog_test_number_picker)
+            val seekBar = findViewById<SeekBar>(R.id.seek_bar).apply {
+                setOnSeekBarChangeListener(object : ProgressListener() {
+                    override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
+                        this@show.findViewById<TextView>(R.id.tv_progress)?.text = "$p1"
+                    }
+                })
+            }
             negativeButton(text = "确定") {
-                findViewById<NumberPicker>(R.id.number_picker).progress.run {
+                seekBar.progress.run {
                     startActivity(WordTestActivity.getStartIntent(this, this@MainActivity))
                 }
             }
         }
     }
 
-    private fun doImport(words: List<WordBean>, includeIndex: IntArray) {
-        viewModel.importWord(words, includeIndex).baseSubscribe({
+    private fun doImport(words: List<WordBean>, indexs: IntArray) {
+        val result = mutableListOf<WordBean>()
+        val date = LocalDate.now().format(DateTimeFormatter.ISO_DATE)
+        for (includeIndex in indexs) result.add(words[includeIndex].apply {
+            this.insertDate = date
+        })
+        viewModel.importWord(result).baseSubscribe({
             Toast.makeText(this, "导入成功", Toast.LENGTH_SHORT).show()
             loadData()
         }, {
@@ -234,16 +198,19 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    @SuppressLint("CheckResult")
+    @SuppressLint("CheckResult", "SetTextI18n")
     private fun showImportWordDialog() {
         var importWordsIndex = intArrayOf()
         val converter: (List<WordBean>) -> List<String> = { wordBeans ->
-            wordBeans.map { "${it.wordName} ${it.wordMean}" }.toCollection(mutableListOf())
+            wordBeans.map { "${it.wordName}\n${it.wordMean}" }.toCollection(mutableListOf())
         }
-        val showDialog: (List<WordBean>) -> Unit = {allWord->
-            createMaterialDialog {
+        val showDialog: (List<WordBean>) -> Unit = { allWord ->
+            createMaterialDialog(this) {
                 title(text = "选择单词 （${allWord.size}）个")
-                listItemsMultiChoice(items = converter(allWord), waitForPositiveButton = false) { _, indices, text ->
+                listItemsMultiChoice(
+                    items = converter(allWord),
+                    waitForPositiveButton = false
+                ) { _, indices, text ->
                     getPositiveButton().run {
                         this.text = "导入(${text.size})"
                         this.isEnabled = indices.isNotEmpty()
@@ -252,22 +219,28 @@ class MainActivity : AppCompatActivity() {
                 }
                 customView(R.layout.dialog_import_word_header)
 
-                positiveButton(text = "导入") {
+                positiveButton(text = "导入(0)") {
                     doImport(allWord, importWordsIndex)
                 }
                 negativeButton(text = "取消") {}
-
+                var seekBar = findViewById<SeekBar>(R.id.seek_bar).apply {
+                    setOnSeekBarChangeListener(object : ProgressListener() {
+                        override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
+                            this@createMaterialDialog.findViewById<Button>(R.id.btn_rand).text =
+                                Editable.Factory.getInstance().newEditable("随机($p1)")
+                        }
+                    })
+                }
                 findViewById<Button>(R.id.btn_rand).setOnClickListener {
-                    var max =findViewById<NumberPicker>(R.id.number_picker).progress
-                    if (max>allWord.size) max=allWord.size
-                    Log.i(TAG, "showImportWordDialog: $max")
+                    var max = seekBar.progress
+                    if (max > allWord.size) max = allWord.size
                     uncheckAllItems()
                     allWord.size.generatorRandom(max).toIntArray().run {
                         checkItems(this)
-                        importWordsIndex =this
+                        importWordsIndex = this
                     }
                     getPositiveButton().run {
-                        this.text = "导入(${max})"
+                        this.text = "导入($max)"
 
                         this.isEnabled = true
                     }
@@ -280,22 +253,30 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun createMaterialDialog(config: MaterialDialog.() -> Unit): MaterialDialog {
-        return MaterialDialog(this).show {
-            config.invoke(this)
-        }
-    }
-
-    private fun MaterialDialog.getPositiveButton(): DialogActionButton {
-        return view.buttonsLayout?.actionButtons?.get(WhichButton.POSITIVE.index)!!
-    }
+    private val getResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.action_settings) showSettingDialog()
+        if (item.itemId == R.id.action_settings) {
+            val intent = Intent(this, SettingsActivity::class.java)
+            getResult.launch(intent)
+        }
 
         if (item.itemId == R.id.action_test) showTestNumberDialog()
 
         if (item.itemId == R.id.action_import) showImportWordDialog()
         return super.onOptionsItemSelected(item)
+    }
+
+    open class ProgressListener : SeekBar.OnSeekBarChangeListener {
+        override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
+
+        }
+
+        override fun onStartTrackingTouch(p0: SeekBar?) {
+        }
+
+        override fun onStopTrackingTouch(p0: SeekBar?) {
+        }
     }
 }

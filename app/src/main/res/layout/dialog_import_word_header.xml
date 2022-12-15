@@ -1,20 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
+    android:gravity="center"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 <Button
     android:id="@+id/btn_rand"
     android:textColor="#000000"
     android:background="#00FFFFFF"
-    android:text="随机"
-    android:layout_width="wrap_content"
+    android:text="随机(10)"
+    android:layout_width="100dp"
     android:layout_height="wrap_content"></Button>
 
-    <com.hxl.android.xiaoan.word.ui.widget.numberpicker.NumberPicker
-        android:id="@+id/number_picker"
-        android:background="#ffffff"
-        android:layout_width="120dp"
-        android:layout_height="50dp">
-    </com.hxl.android.xiaoan.word.ui.widget.numberpicker.NumberPicker>
+
+    <androidx.appcompat.widget.AppCompatSeekBar
+        android:progress="10"
+        android:min="1"
+        android:max="100"
+        android:id="@+id/seek_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" />
+    <!--    <it.sephiroth.android.library.numberpicker.NumberPicker-->
+<!--        android:id="@+id/number_picker"-->
+<!--        android:background="#ffffff"-->
+<!--        android:layout_width="120dp"-->
+<!--        android:layout_height="50dp">-->
+<!--    </it.sephiroth.android.library.numberpicker.NumberPicker>-->
 </LinearLayout>

@@ -13,4 +13,7 @@
     <color name="red">#E17676</color>
     <color name="blue">#38B1C7</color>
     <color name="green">#3DCCAB</color>
+
+
+    <color name="appProgressBackground">#E8EFE8E8</color>
 </resources>

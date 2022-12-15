@@ -3,6 +3,7 @@ package com.hxl.android.xiaoan.word
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
+import androidx.multidex.MultiDex
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.hxl.android.xiaoan.word.utils.SharedPreferencesUtils
@@ -21,5 +22,6 @@ class WordApplication:Application() {
         SharedPreferencesUtils.init(this)
         context=this
         applicationDatabase =Room.databaseBuilder(applicationContext, AppDatabase::class.java, "word-database").build()
+        MultiDex.install(this)
     }
 }

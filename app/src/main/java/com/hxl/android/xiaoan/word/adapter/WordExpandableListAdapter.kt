@@ -1,7 +1,9 @@
 package com.hxl.android.xiaoan.word.adapter
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.media.Image
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,8 +11,11 @@ import android.widget.BaseExpandableListAdapter
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.view.isVisible
+import androidx.preference.PreferenceManager
 import com.hxl.android.xiaoan.word.R
 import com.hxl.android.xiaoan.word.bean.WordBean
+import com.hxl.android.xiaoan.word.bean.meanKey
+import com.hxl.android.xiaoan.word.bean.wordKey
 import com.hxl.android.xiaoan.word.utils.SharedPreferencesUtils
 
 
@@ -24,8 +29,17 @@ class WordExpandableListAdapter(
     var wordVisibleState: () -> Boolean = { true }
 
     var playVoice: (WordBean) -> Unit = {}
+    private val sharedPreferences: SharedPreferences =
+        PreferenceManager.getDefaultSharedPreferences(context)
 
-    val visibleWords = mutableMapOf<Int, Boolean>()
+    private val visibleWords = mutableMapOf<String, Boolean>()
+
+
+    private var clickSync = sharedPreferences.getBoolean("click_sync", true)
+    fun reverseVisible(key: String) {
+        visibleWords[key] = !visibleWords.getOrDefault(key, false)
+    }
+
     fun setData(titles: List<String>, details: MutableMap<String, MutableList<WordBean>>) {
         this.expandableListTitle = titles
         this.expandableListDetail = details
@@ -33,7 +47,7 @@ class WordExpandableListAdapter(
     }
 
 
-    override fun getChild(listPosition: Int, expandedListPosition: Int): Any? {
+    override fun getChild(listPosition: Int, expandedListPosition: Int): WordBean {
         return expandableListDetail[expandableListTitle[listPosition]]!![expandedListPosition]
     }
 
@@ -41,37 +55,41 @@ class WordExpandableListAdapter(
         return expandedListPosition.toLong()
     }
 
-    private fun bindVisible(view: View, fn: () -> Boolean) {
-        view.isVisible = fn.invoke()
-    }
-
     override fun getChildView(
         listPosition: Int, expandedListPosition: Int,
         isLastChild: Boolean, convertView: View?, parent: ViewGroup?
     ): View {
         var convertView = convertView
-        val expandedListText = getChild(listPosition, expandedListPosition) as WordBean?
+        val wordBean = getChild(listPosition, expandedListPosition)
+
         if (convertView == null) {
-            val layoutInflater =
-                context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             convertView = layoutInflater.inflate(R.layout.list_item, parent, false)
         }
         convertView!!.findViewById<ImageView>(R.id.iv_voice)
-            .setOnClickListener { playVoice.invoke(expandedListText!!) }
-        convertView.findViewById<TextView>(R.id.tv_word).text = expandedListText!!.wordName
-        convertView.findViewById<TextView>(R.id.tv_mean).text = expandedListText.wordMean
+            .setOnClickListener { playVoice.invoke(wordBean) }
 
-        bindVisible(convertView.findViewById<TextView>(R.id.tv_word), wordVisibleState)
-        //如没有开启单击显示，则将显示开关绑定到meanVisibleState
-        if (!SharedPreferencesUtils.getBoolean("click_show_flag")) bindVisible(
-            convertView.findViewById<TextView>(R.id.tv_mean), meanVisibleState
-        ) else {
-            //如果visibleWords显示状态是true
-            val visible = visibleWords.getOrDefault(expandedListText.id, false)
-            convertView.findViewById<TextView>(R.id.tv_mean).isVisible = visible
+        convertView.findViewById<TextView>(R.id.tv_word).apply {
+            text = wordBean.wordName
+            isVisible = wordVisibleState.invoke()
+
+            if (clickSync) {
+                if (visibleWords.getOrDefault(wordBean.wordKey(), false)) {
+                    isVisible = true
+                }
+            }
         }
 
+        convertView.findViewById<TextView>(R.id.tv_mean).apply {
+            text = wordBean.wordMean
+            isVisible = meanVisibleState.invoke()
+            if (clickSync) {
+                if (visibleWords.getOrDefault(wordBean.meanKey(), false)) {
+                    isVisible = true
 
+                }
+            }
+        }
         return convertView
     }
 

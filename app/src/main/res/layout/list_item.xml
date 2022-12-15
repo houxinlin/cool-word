@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:orientation="vertical"
     android:paddingLeft="20dp"
+    android:paddingRight="20dp"
     android:minHeight="55dp"
     android:layout_height="55dp">
     <View
@@ -18,16 +19,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/iv_voice"
-            android:layout_gravity="center"
-            android:src="@drawable/ic_play"
-            android:layout_width="19dp"
-            android:layout_height="wrap_content" />
         <LinearLayout
             android:layout_marginLeft="10dp"
             android:orientation="vertical"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="match_parent">
 
             <TextView
@@ -44,7 +40,7 @@
             <TextView
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textColor="#9B9696"
+                android:textColor="#655F5F"
                 android:id="@+id/tv_mean"
                 android:gravity="center|left"
                 android:text="12"
@@ -52,5 +48,11 @@
                 android:layout_height="0dp"
                 android:layout_weight="1" />
         </LinearLayout>
+        <ImageView
+            android:id="@+id/iv_voice"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_play"
+            android:layout_width="19dp"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 </RelativeLayout>

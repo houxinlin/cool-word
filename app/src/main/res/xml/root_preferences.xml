@@ -1,0 +1,45 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="基础设置">
+
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:key="show_word"
+            app:title="显示单词" />
+
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:key="show_mean"
+            app:title="显示翻译" />
+
+        <SwitchPreferenceCompat
+            app:defaultValue="false"
+            app:key="click_sync"
+            app:title="单击显示/隐藏单词" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="单词测试设置">
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:key="auto_play"
+            app:title="自动播放读音" />
+        <SwitchPreferenceCompat
+            app:defaultValue="false"
+            app:key="auto_show_option"
+            app:title="总是显示提示" />
+
+        <SwitchPreferenceCompat
+            app:defaultValue="false"
+            app:key="wait_next"
+            app:title="停止等待并继续下一词" />
+    </PreferenceCategory>
+    <PreferenceCategory app:title="读音设置">
+        <ListPreference
+            app:key="play_type"
+            app:title="读音类型"
+            app:entries="@array/phonetics"
+            app:entryValues="@array/phonetics_values"
+            app:defaultValue="1" />
+    </PreferenceCategory>
+</PreferenceScreen>

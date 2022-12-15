@@ -2,9 +2,13 @@ package com.hxl.android.xiaoan.word.word
 
 class PhoneticsBean {
     //英音
-    lateinit var phonitic: String
+     var phonitic: String=""
 
     //美音
-    lateinit var phontype: String
+     var phontype: String=""
+    override fun toString(): String {
+        return "PhoneticsBean(phonitic='$phonitic', phontype='$phontype')"
+    }
+
 
 }

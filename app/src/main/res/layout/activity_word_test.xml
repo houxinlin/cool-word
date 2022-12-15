@@ -80,34 +80,92 @@
                             android:background="#57FFFFFF"
                             android:padding="6dp">
 
-                            <TextView
-                                android:id="@+id/tv_word"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:text="Hello"
-                                android:textColor="#000000"
-                                android:textSize="28sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:id="@+id/tv_mean"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_below="@+id/tv_word"
-                                android:layout_marginTop="15dp"
-                                android:textColor="#000000"
-                                android:textSize="28sp"
-                                android:textStyle="bold">
-
-                            </TextView>
-
                             <LinearLayout
+                                android:orientation="vertical"
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_below="@+id/tv_mean"
-                                android:layout_marginTop="20dp">
+                                android:layout_height="match_parent">
+                                <LinearLayout
+                                    android:orientation="vertical"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content">
+                                    <TextView
+                                        android:layout_marginLeft="15dp"
+                                        android:id="@+id/tv_word"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text=""
+                                        android:textColor="#000000"
+                                        android:textSize="28sp"
+                                        android:textStyle="bold" />
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content">
+                                        <com.google.android.material.button.MaterialButton
+                                            android:id="@+id/btn_phontype"
+                                            app:iconPadding="3dp"
+                                            android:textAllCaps="false"
+                                            app:icon="@drawable/ic_play"
+                                            app:elevation="0dp"
+                                            android:textSize="12sp"
+                                            android:stateListAnimator="@null"
+                                            android:elevation="0dp"
+                                            app:iconSize="15dp"
+                                            android:text=""
+                                            app:cornerRadius="0dp"
+                                            app:strokeWidth="-1dp"
+                                            app:strokeColor="#000000"
+                                            app:backgroundTint="#FFFFFF"
+                                            app:iconTint="#000000"
+                                            android:textColor="#000000"
+                                            android:minWidth="10dp"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content">
+
+                                        </com.google.android.material.button.MaterialButton>
+                                        <com.google.android.material.button.MaterialButton
+                                            android:textAllCaps="false"
+                                            android:stateListAnimator="@null"
+                                            android:layout_marginLeft="4dp"
+                                            app:icon="@drawable/ic_play"
+                                            app:elevation="0dp"
+                                            app:iconPadding="3dp"
+                                            android:elevation="0dp"
+                                            app:iconSize="15dp"
+                                            android:text=""
+                                            android:textSize="12sp"
+                                            android:id="@+id/btn_phonitic"
+                                            app:cornerRadius="0dp"
+                                            app:strokeWidth="0dp"
+                                            app:strokeColor="#000000"
+                                            app:backgroundTint="#FFFFFF"
+                                            app:iconTint="#000000"
+                                            android:textColor="#000000"
+                                            android:minWidth="10dp"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content">
+
+                                        </com.google.android.material.button.MaterialButton>
+
+                                    </LinearLayout>
+
+                                    <TextView
+                                        android:layout_marginLeft="15dp"
+                                        android:id="@+id/tv_mean"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_below="@+id/tv_word"
+                                        android:layout_marginTop="10dp"
+                                        android:textColor="#000000"
+                                        android:textSize="18sp"
+                                        android:textStyle="bold">
+
+                                    </TextView>
+
+                                </LinearLayout>
+
 
                             </LinearLayout>
+
 
                             <TextView
                                 android:id="@+id/tv_tip"
@@ -118,6 +176,14 @@
                                 android:layout_marginBottom="4dp"
                                 android:text="点击查看提示"
                                 android:textColor="#4D4B4B" />
+                            <com.hxl.android.xiaoan.word.ui.widget.base.OptionView
+                                android:layout_alignParentBottom="true"
+                                android:layout_marginBottom="30dp"
+                                android:id="@+id/option_view"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+
+                            </com.hxl.android.xiaoan.word.ui.widget.base.OptionView>
                         </RelativeLayout>
                     </com.google.android.material.card.MaterialCardView>
 
@@ -299,6 +365,7 @@
 
         <com.hxl.android.xiaoan.word.ui.widget.base.ScaleMaterialCardView
             android:alpha="0"
+            android:visibility="gone"
             android:id="@+id/btn_back"
             android:layout_width="60dp"
             android:layout_height="60dp"

@@ -5,6 +5,7 @@ import android.media.MediaPlayer
 import android.os.Handler
 import android.os.Looper
 import android.util.DisplayMetrics
+import com.afollestad.materialdialogs.MaterialDialog
 import com.hxl.android.xiaoan.word.WordApplication
 import java.util.*
 
@@ -23,5 +24,9 @@ object SystemUtils {
     fun play(resourceId:Int){
         MediaPlayer.create(WordApplication.context,resourceId).start()
     }
-
+    fun createMaterialDialog(context: Context,config: MaterialDialog.() -> Unit): MaterialDialog {
+        return MaterialDialog(context).show {
+            config.invoke(this)
+        }
+    }
 }

@@ -5,10 +5,18 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.afollestad.materialdialogs.bottomsheets.GridItem
+
 @Entity(tableName = "words")
 class WordBean {
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id")
+    var keyId: Int = 0
+
+
+    @ColumnInfo(name = "insert_id")
     var id: Int = 0
+
+    @ColumnInfo(name = "insert_date")
     var insertDate: String = ""
 
     @ColumnInfo(name = "word_mean")
@@ -18,7 +26,14 @@ class WordBean {
     var wordName: String = ""
 
     @ColumnInfo(name = "word_live")
-    var wordLive:Int =-1
+    var wordLive: Int = -1
+
+    @ColumnInfo(name = "phonitic")
+    var phonitic: String = ""
+
+    @ColumnInfo(name = "phontype")
+    var phontype: String = ""
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -44,4 +59,12 @@ class WordBean {
     }
 
 
+}
+
+fun WordBean.meanKey(): String {
+    return "mean-${this.id}"
+}
+
+fun WordBean.wordKey(): String {
+    return "word-${this.id}"
 }

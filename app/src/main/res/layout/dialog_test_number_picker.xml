@@ -1,13 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="10dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.hxl.android.xiaoan.word.ui.widget.numberpicker.NumberPicker
-        android:id="@+id/number_picker"
-        android:layout_centerInParent="true"
-        android:layout_width="130dp"
-        android:layout_height="60dp">
+    <LinearLayout
+        android:gravity="center"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:textColor="#000000"
+            android:id="@+id/tv_progress"
+            android:text="15"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        </TextView>
+        <androidx.appcompat.widget.AppCompatSeekBar
+            android:progress="15"
+            android:max="100"
+            android:min="0"
+            android:id="@+id/seek_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"></androidx.appcompat.widget.AppCompatSeekBar>
+    </LinearLayout>
 
-    </com.hxl.android.xiaoan.word.ui.widget.numberpicker.NumberPicker>
 </RelativeLayout>

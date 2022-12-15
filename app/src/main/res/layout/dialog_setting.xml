@@ -70,4 +70,26 @@
             android:checked="false"
             android:theme="@style/SwitchTheme"></androidx.appcompat.widget.SwitchCompat>
     </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:textColor="@color/appColor"
+            android:layout_centerVertical="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="单击播放读音">
+
+        </TextView>
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switch_click_play"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:checked="true"
+            android:theme="@style/SwitchTheme"></androidx.appcompat.widget.SwitchCompat>
+    </RelativeLayout>
 </LinearLayout>
