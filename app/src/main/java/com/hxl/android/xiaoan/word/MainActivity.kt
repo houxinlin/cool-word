@@ -177,6 +177,10 @@ class MainActivity : BaseActivity() {
                 })
             }
             negativeButton(text = "确定") {
+                if (Application.word.size<4){
+                    Toast.makeText(this@MainActivity, "单词太少啦，快去添加吧", Toast.LENGTH_SHORT).show()
+                    return@negativeButton
+                }
                 seekBar.progress.run {
                     startActivity(WordTestActivity.getStartIntent(this, this@MainActivity))
                 }

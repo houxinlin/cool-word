@@ -158,7 +158,7 @@ class WordTestActivity : BaseActivity() {
     private fun refreshProgress() {
         val notKnowCount = notKnowRecord.count { !knowSet.contains(it) }
 
-        val vagueCount = notKnowRecord.count { !knowSet.contains(it) }
+        val vagueCount = vagueRecord.count { !knowSet.contains(it) }
         wordTestBinding.wordProgress.setState(notKnowCount, vagueCount, knowSet.size)
         wordTestBinding.wordProgress.currentValue = knowSet.size
     }
@@ -171,7 +171,7 @@ class WordTestActivity : BaseActivity() {
         val result = mutableListOf<WordScore>()
         for (key in testWordsCount.keys) {
             val score =
-                ceil(notKnowRecord.getOrDefault(key, 0) * 1.5) + vagueRecord.getOrDefault(key, 0)
+                ceil(notKnowRecord.getOrDefault(key, 0) * 2.5) + vagueRecord.getOrDefault(key, 0)
             result.add(WordScore(key, score.toInt()))
         }
         result.sortBy { it.score }
@@ -207,6 +207,7 @@ class WordTestActivity : BaseActivity() {
      * 下一个单词
      */
     private fun setNextWord(wordBean: WordBean) {
+        refreshProgress()
         wordTestBinding.tvMean.text = ""
         wordTestBinding.tvWord.text = wordBean.wordName
         wordTestBinding.btnPhontype.text = wordBean.phontype.addPrefix("美")
@@ -310,6 +311,7 @@ class WordTestActivity : BaseActivity() {
             nextWordStrategy()
             return
         }
+        SystemUtils.play(R.raw.error)
         doNotKnowRecordCountAndSortWord()
     }
 
@@ -347,6 +349,9 @@ class WordTestActivity : BaseActivity() {
 
     }
 
+    /**
+     * 显示选项
+     */
     private fun showOptions() {
         wordQueue.getCurrentWord()?.run {
             val options = Application.generatorOptions(this.id)

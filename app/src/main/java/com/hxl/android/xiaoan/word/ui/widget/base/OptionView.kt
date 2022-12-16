@@ -27,6 +27,7 @@ class OptionView @JvmOverloads constructor(
     private var rightOptionId = -1
 
     private var showOptions = false
+    private var canClick = true
 
     init {
         LayoutInflater.from(context).inflate(R.layout.option_view, this, true)
@@ -34,8 +35,9 @@ class OptionView @JvmOverloads constructor(
     }
 
     fun setOptions(rightOptionId: Int, options: List<Option>) {
+        rootView.isVisible = true
+        canClick = true
         if (options.size <= 4) {
-            rootView.isVisible = true
             this.rightOptionId = rightOptionId
             for (i in options.indices) {
                 (rootView.getChildAt(i) as TextView).apply {
@@ -46,7 +48,7 @@ class OptionView @JvmOverloads constructor(
             }
         }
         //设置选项时候，如果没有显示过，则进行一个动画
-        if (!showOptions){
+        if (!showOptions) {
             val viewAnimator: (View, Int, Int) -> Unit = { view: View, from: Int, to: Int ->
                 ObjectAnimator.ofFloat(view, "translationX", from.toFloat(), to.toFloat()).apply {
                     this.interpolator = OvershootInterpolator()
@@ -54,15 +56,35 @@ class OptionView @JvmOverloads constructor(
                     start()
                 }
             }
-            viewAnimator.invoke(rootView.getChildAt(0), -getItemWidth(0),0)
-            SystemUtils.delayRun(50) { viewAnimator.invoke(rootView.getChildAt(1), -getItemWidth(1), 0) }
-            SystemUtils.delayRun(100) { viewAnimator.invoke(rootView.getChildAt(2), -getItemWidth(2), 0) }
-            SystemUtils.delayRun(150) { viewAnimator.invoke(rootView.getChildAt(3), -getItemWidth(3), 0) }
+            rootView.post {
+                viewAnimator.invoke(rootView.getChildAt(0), -getItemWidth(0), 0)
+                SystemUtils.delayRun(50) {
+                    viewAnimator.invoke(
+                        rootView.getChildAt(1),
+                        -getItemWidth(1),
+                        0
+                    )
+                }
+                SystemUtils.delayRun(100) {
+                    viewAnimator.invoke(
+                        rootView.getChildAt(2),
+                        -getItemWidth(2),
+                        0
+                    )
+                }
+                SystemUtils.delayRun(150) {
+                    viewAnimator.invoke(
+                        rootView.getChildAt(3),
+                        -getItemWidth(3),
+                        0
+                    )
+                }
+            }
             showOptions = true
         }
     }
 
-    private fun getItemWidth(index: Int):Int{
+    private fun getItemWidth(index: Int): Int {
         return rootView.getChildAt(index).measuredWidth
     }
 
@@ -73,20 +95,25 @@ class OptionView @JvmOverloads constructor(
         for (i in 0..3) {
             (rootView.getChildAt(i) as TextView).apply {
                 if ((tag as Option).id == rightOptionId) {
-                    background = resources.getDrawable(R.drawable.shape_option_view_text_right, null)
+                    background =
+                        resources.getDrawable(R.drawable.shape_option_view_text_right, null)
                 } else {
                     if (option.id != rightOptionId) {
-                        background = resources.getDrawable(R.drawable.shape_option_view_text_error, null)
+                        background =
+                            resources.getDrawable(R.drawable.shape_option_view_text_error, null)
                     }
                 }
             }
         }
     }
 
-    private fun onOptionClick(view:View){
-        (view.tag as Option).let {
-            showResult(it)
-            listener.invoke(it)
+    private fun onOptionClick(view: View) {
+        if (canClick) {
+            canClick = false
+            (view.tag as Option).let {
+                showResult(it)
+                listener.invoke(it)
+            }
         }
     }
 
@@ -101,10 +128,11 @@ class OptionView @JvmOverloads constructor(
     fun reset() {
         rootView.isVisible = false
         showOptions = false
+        canClick = true
         for (i in 0..3) {
             (rootView.getChildAt(i) as TextView).apply {
                 setOnClickListener { onOptionClick(it) }
-                translationX=-this.measuredWidth.toFloat() //准备下一个动画
+                translationX = -this.measuredWidth.toFloat() //准备下一个动画
             }
         }
 
@@ -113,13 +141,13 @@ class OptionView @JvmOverloads constructor(
     override fun onFinishInflate() {
         super.onFinishInflate()
         rootView = getChildAt(0) as LinearLayout
-        rootView.viewTreeObserver.addOnGlobalLayoutListener( object :
+        rootView.viewTreeObserver.addOnGlobalLayoutListener(object :
             ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 for (i in 0..3) {
                     (rootView.getChildAt(i) as TextView).apply {
                         setOnClickListener { onOptionClick(it) }
-                        translationX=-this.measuredWidth.toFloat()
+                        translationX = -this.measuredWidth.toFloat()
                     }
                 }
                 rootView.viewTreeObserver.removeOnGlobalLayoutListener(this)

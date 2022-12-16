@@ -48,10 +48,8 @@ fun <T> List<T>.random(size: Int): List<T> {
         result.shuffle()
         return result
     }
-    for (i in 1..size) {
-        result.add(this.random())
-    }
-    return result
+
+    return  this.toCollection(mutableListOf()).shuffled().subList(0,size)
 }
 
 fun <E> MutableList<E>.addNearby(max: Int, value: E): Boolean {

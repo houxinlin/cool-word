@@ -20,6 +20,7 @@ class WordTestQueue: LinkedBlockingDeque<WordBean>() {
         //生成测试的单词
         val tempWords = Application.generatorTestWord(size)
         tempWords.forEach { addFirst(it) }
+
          success.invoke(tempWords)
     }
 

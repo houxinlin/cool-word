@@ -14,7 +14,10 @@ object Application {
     }
 
     fun generatorOptions(id:Int):MutableList<Option>{
-       return word.filter { it.id!=id }.random(3).map { Option(it.id,it.wordMean) }.toCollection(mutableListOf())
+       return word.filter { it.id!=id }
+           .random(3)
+           .map { Option(it.id,it.wordMean) }
+           .toCollection(mutableListOf())
     }
 
 }
