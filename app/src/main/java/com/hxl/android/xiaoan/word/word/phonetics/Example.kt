@@ -1,4 +1,4 @@
-package com.hxl.android.xiaoan.word.word
+package com.hxl.android.xiaoan.word.word.phonetics
 
 import io.reactivex.rxjava3.core.Observable
 

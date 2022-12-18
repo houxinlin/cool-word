@@ -1,6 +1,7 @@
-package com.hxl.android.xiaoan.word.word
+package com.hxl.android.xiaoan.word.word.example
 
 import com.hxl.android.xiaoan.word.utils.RxJavaUtils
+import com.hxl.android.xiaoan.word.word.phonetics.Example
 import io.reactivex.rxjava3.core.Observable
 import java.net.URL
 import java.util.regex.Pattern

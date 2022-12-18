@@ -1,7 +1,7 @@
 package com.hxl.android.xiaoan.word.word
 
 import com.hxl.android.xiaoan.word.bean.WordBean
-import com.hxl.android.xiaoan.word.common.Application
+import com.hxl.android.xiaoan.word.common.WordManager
 import com.hxl.android.xiaoan.word.ui.activity.WordTestActivity
 import java.util.concurrent.LinkedBlockingDeque
 
@@ -18,10 +18,10 @@ class WordTestQueue: LinkedBlockingDeque<WordBean>() {
 
      fun initTestWord(size: Int,success:(List<WordBean>)->Unit) {
         //生成测试的单词
-        val tempWords = Application.generatorTestWord(size)
+        val tempWords = WordManager.generatorTestWord(size)
         tempWords.forEach { addFirst(it) }
 
-         success.invoke(tempWords)
+        success.invoke(tempWords)
     }
 
 

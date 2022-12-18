@@ -205,7 +205,7 @@
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:background="#E17676"
+                                android:background="@color/red"
                                 android:gravity="center"
                                 android:orientation="vertical">
 
@@ -235,7 +235,7 @@
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:background="#38B1C7"
+                                android:background="@color/blue"
                                 android:gravity="center"
                                 android:orientation="vertical">
 
@@ -266,7 +266,7 @@
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:background="#3DCCAB"
+                                android:background="@color/green"
                                 android:gravity="center"
                                 android:orientation="vertical">
 

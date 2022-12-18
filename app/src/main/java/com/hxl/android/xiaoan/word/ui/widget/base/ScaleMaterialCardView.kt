@@ -14,9 +14,9 @@ class ScaleMaterialCardView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : MaterialCardView(context, attrs, defStyleAttr) {
+    var lock = false
     private var lastClick: Long = 0
     override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
-
         if (event?.action == MotionEvent.ACTION_DOWN) {
             startScale(this)
         }
@@ -24,12 +24,13 @@ class ScaleMaterialCardView @JvmOverloads constructor(
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        if(event.action==MotionEvent.ACTION_DOWN){
-            if (System.currentTimeMillis()-lastClick<800){
+        if (event.action == MotionEvent.ACTION_DOWN) {
+            if (System.currentTimeMillis() - lastClick < 800) {
                 return true
             }
-            lastClick =System.currentTimeMillis()
+            lastClick = System.currentTimeMillis()
         }
+        if (lock) return true
         return super.onTouchEvent(event)
     }
 

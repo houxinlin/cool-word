@@ -25,8 +25,8 @@ class WordBean {
     @ColumnInfo(name = "word_name")
     var wordName: String = ""
 
-    @ColumnInfo(name = "word_live")
-    var wordLive: Int = -1
+    @ColumnInfo(name = "word_level")
+    var wordLevel: Int = -1
 
     @ColumnInfo(name = "phonitic")
     var phonitic: String = ""

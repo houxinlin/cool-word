@@ -2,8 +2,6 @@ package com.hxl.android.xiaoan.word.adapter
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.media.Image
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,7 +14,7 @@ import com.hxl.android.xiaoan.word.R
 import com.hxl.android.xiaoan.word.bean.WordBean
 import com.hxl.android.xiaoan.word.bean.meanKey
 import com.hxl.android.xiaoan.word.bean.wordKey
-import com.hxl.android.xiaoan.word.utils.SharedPreferencesUtils
+import com.hxl.android.xiaoan.word.ui.widget.base.WordLevelView
 
 
 class WordExpandableListAdapter(
@@ -66,7 +64,8 @@ class WordExpandableListAdapter(
             val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             convertView = layoutInflater.inflate(R.layout.list_item, parent, false)
         }
-        convertView!!.findViewById<ImageView>(R.id.iv_voice)
+        convertView!!.findViewById<WordLevelView>(R.id.word_level).levelValue=wordBean.wordLevel
+        convertView.findViewById<ImageView>(R.id.iv_voice)
             .setOnClickListener { playVoice.invoke(wordBean) }
 
         convertView.findViewById<TextView>(R.id.tv_word).apply {

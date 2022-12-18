@@ -27,7 +27,7 @@ class OptionView @JvmOverloads constructor(
     private var rightOptionId = -1
 
     private var showOptions = false
-    private var canClick = true
+     var canClick = true
 
     init {
         LayoutInflater.from(context).inflate(R.layout.option_view, this, true)
@@ -91,17 +91,14 @@ class OptionView @JvmOverloads constructor(
     /**
      * 单击后显示结果
      */
-    private fun showResult(option: Option) {
+     fun showResult() {
+        if (rightOptionId==-1) return
         for (i in 0..3) {
             (rootView.getChildAt(i) as TextView).apply {
-                if ((tag as Option).id == rightOptionId) {
-                    background =
-                        resources.getDrawable(R.drawable.shape_option_view_text_right, null)
+                background = if ((tag as Option).id == rightOptionId) {
+                    resources.getDrawable(R.drawable.shape_option_view_text_right, null)
                 } else {
-                    if (option.id != rightOptionId) {
-                        background =
-                            resources.getDrawable(R.drawable.shape_option_view_text_error, null)
-                    }
+                    resources.getDrawable(R.drawable.shape_option_view_text_error, null)
                 }
             }
         }
@@ -111,7 +108,7 @@ class OptionView @JvmOverloads constructor(
         if (canClick) {
             canClick = false
             (view.tag as Option).let {
-                showResult(it)
+                showResult()
                 listener.invoke(it)
             }
         }
@@ -129,6 +126,7 @@ class OptionView @JvmOverloads constructor(
         rootView.isVisible = false
         showOptions = false
         canClick = true
+        rightOptionId=-1
         for (i in 0..3) {
             (rootView.getChildAt(i) as TextView).apply {
                 setOnClickListener { onOptionClick(it) }

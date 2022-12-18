@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">xiaoan-word</string>
+    <string name="app_name">背呀</string>
     <string name="action_settings">设置</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>

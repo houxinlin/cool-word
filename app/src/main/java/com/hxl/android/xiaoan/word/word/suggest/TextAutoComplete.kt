@@ -1,4 +1,4 @@
-package com.hxl.android.xiaoan.word.word
+package com.hxl.android.xiaoan.word.word.suggest
 
 import android.text.Editable
 import android.widget.ArrayAdapter

@@ -10,11 +10,12 @@ import java.util.concurrent.TimeUnit
 
 object Net {
     private const val HOST = "https://www.houxinlin.com/xiaoan-word/"
-//private const val HOST = "http://192.168.124.10:6061/"
+
+    //private const val HOST = "http://192.168.124.10:6061/"
     private val okHttpClient = OkHttpClient()
         .newBuilder()
-        .connectTimeout(3,TimeUnit.SECONDS)
-        .readTimeout(3,TimeUnit.SECONDS)
+        .connectTimeout(3, TimeUnit.SECONDS)
+        .readTimeout(3, TimeUnit.SECONDS)
         .build()
 
     private val gson = GsonBuilder()
@@ -46,7 +47,21 @@ object Net {
         val request: Request = Request.Builder().url(url).build()
         val response: Response = okHttpClient.newCall(request).execute()
 
-        if (response.code!=200 || response.body==null) return null
+        if (response.code != 200 || response.body == null) return null
         return response.body!!.byteStream().readBytes()
+    }
+
+    fun getHttpResponse(url: String, timeout: Long=1, timeUnit: TimeUnit=TimeUnit.SECONDS): String? {
+        try {
+            val request: Request = Request.Builder().url(url).build()
+            val response = OkHttpClient()
+                .newBuilder()
+                .connectTimeout(timeout, timeUnit)
+                .readTimeout(timeout, timeUnit)
+                .build().newCall(request).execute()
+            return response.body?.toString()
+        } catch (e: Exception) {
+        }
+        return null
     }
 }

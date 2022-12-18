@@ -5,6 +5,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
+import android.view.ViewConfiguration
 import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.CycleInterpolator
@@ -29,7 +30,6 @@ class WordViewGroup @JvmOverloads constructor(
     private var twoLeft: Float = 0f
     private var moveDistance: Float = 0f
     private var downMill: Long = 0
-
     var callback: (Float) -> Unit = {}
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         for (i in 0 until childCount) {
@@ -40,6 +40,7 @@ class WordViewGroup @JvmOverloads constructor(
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
+        val touchSlop =ViewConfiguration.get(context).scaledTouchSlop
         if (event.action == MotionEvent.ACTION_DOWN) {
             downX = event.x
             downMill = System.currentTimeMillis()
@@ -47,7 +48,7 @@ class WordViewGroup @JvmOverloads constructor(
         }
         if (event.action == MotionEvent.ACTION_MOVE) {
 
-            if (abs(event.x - downX) > 20) {
+            if (abs(event.x - downX) > touchSlop) {
                 moveDistance = (downX - event.x)
 
                 var left = (twoLeft.toInt() - moveDistance.toInt())

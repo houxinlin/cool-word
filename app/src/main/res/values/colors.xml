@@ -10,9 +10,9 @@
 
     <color name="appColor">#000000</color>
 
-    <color name="red">#E17676</color>
-    <color name="blue">#38B1C7</color>
-    <color name="green">#3DCCAB</color>
+    <color name="red">#ED8A8A</color>
+    <color name="blue">#36C6E0</color>
+    <color name="green">#3CDEB8</color>
 
 
     <color name="appProgressBackground">#E8EFE8E8</color>

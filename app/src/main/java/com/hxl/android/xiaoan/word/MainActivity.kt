@@ -1,11 +1,15 @@
 package com.hxl.android.xiaoan.word
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.AbsListView
 import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.EditText
@@ -14,6 +18,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.core.animation.addListener
+import androidx.core.animation.doOnEnd
+import androidx.core.view.isVisible
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.list.*
@@ -21,15 +28,17 @@ import com.hxl.android.xiaoan.word.adapter.WordExpandableListAdapter
 import com.hxl.android.xiaoan.word.bean.WordBean
 import com.hxl.android.xiaoan.word.bean.meanKey
 import com.hxl.android.xiaoan.word.bean.wordKey
-import com.hxl.android.xiaoan.word.common.Application
+import com.hxl.android.xiaoan.word.common.WordManager
 import com.hxl.android.xiaoan.word.databinding.ActivityMainBinding
 import com.hxl.android.xiaoan.word.ui.activity.SettingsActivity
 import com.hxl.android.xiaoan.word.ui.activity.WordTestActivity
 import com.hxl.android.xiaoan.word.utils.*
 import com.hxl.android.xiaoan.word.utils.SystemUtils.createMaterialDialog
-import com.hxl.android.xiaoan.word.word.TextAutoComplete
+import com.hxl.android.xiaoan.word.word.suggest.TextAutoComplete
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.concurrent.Semaphore
+import kotlin.math.log
 
 
 class MainActivity : BaseActivity() {
@@ -41,8 +50,8 @@ class MainActivity : BaseActivity() {
     private lateinit var exceptionHandler: ExceptionHandler
     private val textAutCompat: TextAutoComplete = TextAutoComplete()
     private val viewModel: MainViewModel by viewModels()
-
-
+    private var firstVisibleItem =0
+    private val  fabAnimatorSemaphore =Semaphore(1)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -57,7 +66,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun setLoadLocalWords(list: List<WordBean>) {
-        Application.word = list
+        WordManager.word = list
         val adapterData = mutableMapOf<String, MutableList<WordBean>>()
         supportActionBar?.title = "已背 ${list.size} 个"
         list.forEach {
@@ -71,7 +80,45 @@ class MainActivity : BaseActivity() {
         wordExpandableListAdapter.notifyDataSetChanged()
     }
 
+    private fun setFabVisible(visible: Boolean){
+        val from =if (visible) 0f else 1f
+        val to =if (visible) 1f else 0f
+        if(binding.fab.isVisible==visible) return
+        if (fabAnimatorSemaphore.tryAcquire()){
+            AnimatorSet().apply {
+                playTogether( ObjectAnimator.ofFloat(binding.fab,"scaleX",from,to),
+                    ObjectAnimator.ofFloat(binding.fab,"scaleY",from,to))
+                duration=300
+                addListener(onEnd = {
+                    fabAnimatorSemaphore.release()
+                    binding.fab.isVisible=visible
+                    Log.i(TAG, "setFabVisible: ${ binding.fab.isVisible}")
+                })
+                start()
+            }
+        }
+
+
+    }
+
     private fun initView() {
+        binding.listview.setOnScrollListener(object :AbsListView.OnScrollListener{
+            override fun onScrollStateChanged(p0: AbsListView?, p1: Int) {
+                
+            }
+
+            override fun onScroll(p0: AbsListView?, firstVisibleItem: Int, p2: Int, p3: Int) {
+                if ( this@MainActivity.firstVisibleItem ==firstVisibleItem) return
+                if (firstVisibleItem>this@MainActivity.firstVisibleItem && binding.fab.isVisible){
+                    setFabVisible(false)
+                }
+                if (firstVisibleItem<this@MainActivity.firstVisibleItem && (!binding.fab.isVisible)){
+                    setFabVisible(true)
+                }
+                this@MainActivity.firstVisibleItem =firstVisibleItem
+            }
+        })
+
         binding.fab.setOnClickListener { showAddWordDialog() }
         binding.listview.setAdapter(wordExpandableListAdapter)
 
@@ -133,6 +180,7 @@ class MainActivity : BaseActivity() {
                 viewModel.importWord(mutableListOf(WordBean().apply {
                     this.wordMean = mean
                     this.wordName = word
+                    this.id = -1
                 })).subscribe {
                     loadData()
                     Toast.makeText(this@MainActivity, "导入成功", Toast.LENGTH_SHORT).show()
@@ -177,11 +225,12 @@ class MainActivity : BaseActivity() {
                 })
             }
             negativeButton(text = "确定") {
-                if (Application.word.size<4){
+                if (WordManager.word.size < 4) {
                     Toast.makeText(this@MainActivity, "单词太少啦，快去添加吧", Toast.LENGTH_SHORT).show()
                     return@negativeButton
                 }
                 seekBar.progress.run {
+                    if (this == 0) return@negativeButton
                     startActivity(WordTestActivity.getStartIntent(this, this@MainActivity))
                 }
             }
@@ -189,6 +238,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun doImport(words: List<WordBean>, indexs: IntArray) {
+        showLoading()
         val result = mutableListOf<WordBean>()
         val date = LocalDate.now().format(DateTimeFormatter.ISO_DATE)
         for (includeIndex in indexs) result.add(words[includeIndex].apply {
@@ -196,6 +246,7 @@ class MainActivity : BaseActivity() {
         })
         viewModel.importWord(result).baseSubscribe({
             Toast.makeText(this, "导入成功", Toast.LENGTH_SHORT).show()
+            cancelDialog()
             loadData()
         }, {
             Toast.makeText(this, "导入失败", Toast.LENGTH_SHORT).show()
@@ -204,11 +255,13 @@ class MainActivity : BaseActivity() {
 
     @SuppressLint("CheckResult", "SetTextI18n")
     private fun showImportWordDialog() {
+        showLoading()
         var importWordsIndex = intArrayOf()
         val converter: (List<WordBean>) -> List<String> = { wordBeans ->
             wordBeans.map { "${it.wordName}\n${it.wordMean}" }.toCollection(mutableListOf())
         }
         val showDialog: (List<WordBean>) -> Unit = { allWord ->
+            cancelDialog()
             createMaterialDialog(this) {
                 title(text = "选择单词 （${allWord.size}）个")
                 listItemsMultiChoice(
@@ -252,7 +305,7 @@ class MainActivity : BaseActivity() {
             }
         }
 
-        val ids = Application.word.map { it.id }.toCollection(mutableListOf())
+        val ids = WordManager.word.map { it.id }.toCollection(mutableListOf())
         viewModel.loadNetworkWords(ids).baseSubscribe({ showDialog(it) }, exceptionHandler)
 
     }
@@ -265,7 +318,6 @@ class MainActivity : BaseActivity() {
             val intent = Intent(this, SettingsActivity::class.java)
             getResult.launch(intent)
         }
-
         if (item.itemId == R.id.action_test) showTestNumberDialog()
 
         if (item.itemId == R.id.action_import) showImportWordDialog()

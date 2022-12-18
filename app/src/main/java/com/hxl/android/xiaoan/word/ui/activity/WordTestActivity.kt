@@ -24,13 +24,14 @@ import com.afollestad.materialdialogs.callbacks.onCancel
 import com.afollestad.materialdialogs.utils.MDUtil.inflate
 import com.hxl.android.xiaoan.word.BaseActivity
 import com.hxl.android.xiaoan.word.R
+import com.hxl.android.xiaoan.word.WordApplication
 import com.hxl.android.xiaoan.word.bean.WordBean
-import com.hxl.android.xiaoan.word.common.Application
+import com.hxl.android.xiaoan.word.common.WordManager
 import com.hxl.android.xiaoan.word.databinding.ActivityWordTestBinding
 import com.hxl.android.xiaoan.word.ui.widget.base.CircularProgressBar
 import com.hxl.android.xiaoan.word.ui.widget.base.Option
 import com.hxl.android.xiaoan.word.utils.*
-import com.hxl.android.xiaoan.word.word.FrdicExample
+import com.hxl.android.xiaoan.word.word.example.FrdicExample
 import com.hxl.android.xiaoan.word.word.IWordRecord
 import com.hxl.android.xiaoan.word.word.WordTestQueue
 import java.util.concurrent.Semaphore
@@ -52,7 +53,7 @@ class WordTestActivity : BaseActivity() {
     private val example = FrdicExample()
     private val examples = mutableListOf<Spanned>()
     private val nextWordSemaphore = Semaphore(1)
-
+    private var isFinish =false
     private val removeAndNexWordStrategy: (WordBean) -> Unit = {
         knowSet.add(it)
         SystemUtils.play(R.raw.success)
@@ -104,8 +105,10 @@ class WordTestActivity : BaseActivity() {
         }
     }
 
-    private fun nextWordStrategy() {
+    private fun doNextWordStrategy() {
+        wordTestBinding.optionView.canClick=false
         val currentWord = wordQueue.getCurrentWord()
+        wordTestBinding.optionView.showResult()
         currentWord?.run {
             wordTestBinding.tvMean.text = currentWord.wordMean
             if (wordQueue.size <= 1 || testWordsCount[this]!! <= 0) removeAndNexWordStrategy(
@@ -163,8 +166,17 @@ class WordTestActivity : BaseActivity() {
         wordTestBinding.wordProgress.currentValue = knowSet.size
     }
 
+    private fun addWordLevel(result:List<WordScore>){
+        RxJavaUtils.createObservable<Boolean> {
+            val updataList=  result.filter { it.score==0 }
+                .map { it.wordBean.apply { this.wordLevel++ } }
+                .toCollection(mutableListOf())
+            WordApplication.applicationDatabase.wordDao().updata(updataList)
+            onNext(true)
+        }.subscribe {  }
+    }
     /**
-     * 完成测试
+     * 完成测试,并统计结果
      */
 
     private fun doFinish() {
@@ -174,6 +186,7 @@ class WordTestActivity : BaseActivity() {
                 ceil(notKnowRecord.getOrDefault(key, 0) * 2.5) + vagueRecord.getOrDefault(key, 0)
             result.add(WordScore(key, score.toInt()))
         }
+        addWordLevel(result)
         result.sortBy { it.score }
         MaterialDialog(this).show {
             title(text = "统计")
@@ -243,11 +256,17 @@ class WordTestActivity : BaseActivity() {
      * 下一个单词
      */
     private fun doNextWord() {
+        if (isFinish) return
+        wordTestBinding.btnKnow.lock =false
+        wordTestBinding.btnVague.lock =false
+        wordTestBinding.btnIncognizance.lock =false
+        wordTestBinding.optionView.canClick=true
         wordQueue.pollFirst()//弹出一个
         wordTestBinding.wordViewgroup.close()
         setContinueButtonVisible(false)
         refreshProgress()
         if (wordQueue.peekFirst() == null) {
+            isFinish=true
             doFinish()
             return
         }
@@ -286,6 +305,8 @@ class WordTestActivity : BaseActivity() {
 
 
     private fun doRecordCountAndSortWord(iWordRecord: IWordRecord) {
+        wordTestBinding.optionView.canClick=false
+        wordTestBinding.optionView.showResult()
         recordCountAndSortWord(iWordRecord) { list, word ->
             testWordsCount[word] = DEFAULT_KNOW_COUNT + iWordRecord.getDefaultCount()
             list.addNearby(INSERT_NEARBY, word)
@@ -301,14 +322,23 @@ class WordTestActivity : BaseActivity() {
         doRecordCountAndSortWord(vagueRecord)
     }
 
+    /**
+     * 继续事件
+     */
     private fun doContinueButtonClick() {
-        setContinueButtonVisible(false)
-        doNextWord()
+        if (!waitUserContinue()){
+            setContinueButtonVisible(false)
+            doNextWord()
+        }
     }
 
     private fun doOptionClick(option: Option) {
+        wordTestBinding.btnKnow.lock =true
+        wordTestBinding.btnVague.lock =true
+        wordTestBinding.btnIncognizance.lock =true
+
         if (option.id == wordQueue.getCurrentWord()?.id) {
-            nextWordStrategy()
+            doNextWordStrategy()
             return
         }
         SystemUtils.play(R.raw.error)
@@ -339,12 +369,14 @@ class WordTestActivity : BaseActivity() {
         wordTestBinding.btnBack.setOnClickListener { wordTestBinding.wordViewgroup.close() }
 
         wordTestBinding.btnNext.setOnClickListener { doContinueButtonClick() }
+
+        wordTestBinding.btnKnow.setOnClickListener { doNextWordStrategy() }
         wordTestBinding.btnIncognizance.setOnClickListener { doNotKnowRecordCountAndSortWord() }
         wordTestBinding.btnVague.setOnClickListener { doVagueRecordCountAndSortWord() }
 
         wordTestBinding.optionView.setClickOption { doOptionClick(it) }
 
-        wordTestBinding.btnKnow.setOnClickListener { nextWordStrategy() }
+
         wordTestBinding.tvTip.setOnClickListener { showOptions() }
 
     }
@@ -354,7 +386,7 @@ class WordTestActivity : BaseActivity() {
      */
     private fun showOptions() {
         wordQueue.getCurrentWord()?.run {
-            val options = Application.generatorOptions(this.id)
+            val options = WordManager.generatorOptions(this.id)
             options.add(Option(this.id, this.wordMean))
             wordTestBinding.optionView.setOptions(this.id, options.shuffled())
             wordTestBinding.tvTip.isVisible = false
