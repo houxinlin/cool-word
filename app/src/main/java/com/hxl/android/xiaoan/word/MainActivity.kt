@@ -50,8 +50,8 @@ class MainActivity : BaseActivity() {
     private lateinit var exceptionHandler: ExceptionHandler
     private val textAutCompat: TextAutoComplete = TextAutoComplete()
     private val viewModel: MainViewModel by viewModels()
-    private var firstVisibleItem =0
-    private val  fabAnimatorSemaphore =Semaphore(1)
+    private var firstVisibleItem = 0
+    private val fabAnimatorSemaphore = Semaphore(1)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -63,6 +63,10 @@ class MainActivity : BaseActivity() {
         initView()
         loadData()
         applySetting()
+    }
+
+    private fun expand() {
+        binding.listview.expandGroup(0)
     }
 
     private fun setLoadLocalWords(list: List<WordBean>) {
@@ -78,21 +82,26 @@ class MainActivity : BaseActivity() {
             .sortedBy { LocalDate.parse(it, DateTimeFormatter.ofPattern("yyyy-MM-dd")) }
         wordExpandableListAdapter.setData(titles.reversed(), adapterData)
         wordExpandableListAdapter.notifyDataSetChanged()
+
+        if (list.isNotEmpty()) expand()
+
     }
 
-    private fun setFabVisible(visible: Boolean){
-        val from =if (visible) 0f else 1f
-        val to =if (visible) 1f else 0f
-        if(binding.fab.isVisible==visible) return
-        if (fabAnimatorSemaphore.tryAcquire()){
+    private fun setFabVisible(visible: Boolean) {
+        val from = if (visible) 0f else 1f
+        val to = if (visible) 1f else 0f
+        if (binding.fab.isVisible == visible) return
+        if (fabAnimatorSemaphore.tryAcquire()) {
             AnimatorSet().apply {
-                playTogether( ObjectAnimator.ofFloat(binding.fab,"scaleX",from,to),
-                    ObjectAnimator.ofFloat(binding.fab,"scaleY",from,to))
-                duration=300
+                playTogether(
+                    ObjectAnimator.ofFloat(binding.fab, "scaleX", from, to),
+                    ObjectAnimator.ofFloat(binding.fab, "scaleY", from, to)
+                )
+                duration = 300
                 addListener(onEnd = {
                     fabAnimatorSemaphore.release()
-                    binding.fab.isVisible=visible
-                    Log.i(TAG, "setFabVisible: ${ binding.fab.isVisible}")
+                    binding.fab.isVisible = visible
+                    Log.i(TAG, "setFabVisible: ${binding.fab.isVisible}")
                 })
                 start()
             }
@@ -102,20 +111,20 @@ class MainActivity : BaseActivity() {
     }
 
     private fun initView() {
-        binding.listview.setOnScrollListener(object :AbsListView.OnScrollListener{
+        binding.listview.setOnScrollListener(object : AbsListView.OnScrollListener {
             override fun onScrollStateChanged(p0: AbsListView?, p1: Int) {
-                
+
             }
 
             override fun onScroll(p0: AbsListView?, firstVisibleItem: Int, p2: Int, p3: Int) {
-                if ( this@MainActivity.firstVisibleItem ==firstVisibleItem) return
-                if (firstVisibleItem>this@MainActivity.firstVisibleItem && binding.fab.isVisible){
+                if (this@MainActivity.firstVisibleItem == firstVisibleItem) return
+                if (firstVisibleItem > this@MainActivity.firstVisibleItem && binding.fab.isVisible) {
                     setFabVisible(false)
                 }
-                if (firstVisibleItem<this@MainActivity.firstVisibleItem && (!binding.fab.isVisible)){
+                if (firstVisibleItem < this@MainActivity.firstVisibleItem && (!binding.fab.isVisible)) {
                     setFabVisible(true)
                 }
-                this@MainActivity.firstVisibleItem =firstVisibleItem
+                this@MainActivity.firstVisibleItem = firstVisibleItem
             }
         })
 

@@ -21,7 +21,7 @@ object WordManager {
      * 生成选项
      */
     fun generatorOptions(id:Int):MutableList<Option>{
-       return word.filter { it.id!=id }
+       return word.filter { it.keyId!=id }
            .random(3)
            .map { Option(it.id,it.wordMean) }
            .toCollection(mutableListOf())

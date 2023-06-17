@@ -12,7 +12,6 @@ class WordBean {
     @ColumnInfo(name = "id")
     var keyId: Int = 0
 
-
     @ColumnInfo(name = "insert_id")
     var id: Int = 0
 

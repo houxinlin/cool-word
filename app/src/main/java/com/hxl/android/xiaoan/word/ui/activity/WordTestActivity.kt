@@ -111,12 +111,12 @@ class WordTestActivity : BaseActivity() {
         wordTestBinding.optionView.showResult()
         currentWord?.run {
             wordTestBinding.tvMean.text = currentWord.wordMean
-            if (wordQueue.size <= 1 || testWordsCount[this]!! <= 0) removeAndNexWordStrategy(
-                this
-            )
-            //如果还需要继续背诵,添加到随机位置
-            if ((testWordsCount[this]!! > 0)) insertAndNexWordStrategy(this)
-
+            if (wordQueue.size <= 1 || testWordsCount[this]!! <= 0) {
+                removeAndNexWordStrategy(this)
+            }else{
+                //如果还需要继续背诵,添加到随机位置
+                if ((testWordsCount[this]!! > 0)) insertAndNexWordStrategy(this)
+            }
             delayAndNextWord()
 
         }
@@ -337,7 +337,7 @@ class WordTestActivity : BaseActivity() {
         wordTestBinding.btnVague.lock =true
         wordTestBinding.btnIncognizance.lock =true
 
-        if (option.id == wordQueue.getCurrentWord()?.id) {
+        if (option.id == wordQueue.getCurrentWord()?.keyId) {
             doNextWordStrategy()
             return
         }
@@ -386,9 +386,9 @@ class WordTestActivity : BaseActivity() {
      */
     private fun showOptions() {
         wordQueue.getCurrentWord()?.run {
-            val options = WordManager.generatorOptions(this.id)
-            options.add(Option(this.id, this.wordMean))
-            wordTestBinding.optionView.setOptions(this.id, options.shuffled())
+            val options = WordManager.generatorOptions(this.keyId)
+            options.add(Option(this.keyId, this.wordMean))
+            wordTestBinding.optionView.setOptions(this.keyId, options.shuffled())
             wordTestBinding.tvTip.isVisible = false
         }
 
